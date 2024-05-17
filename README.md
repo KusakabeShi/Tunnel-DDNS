@@ -5,13 +5,13 @@
 
 假設:
 
-伺服器IP: `2400:1b85:637b::1234/64`
+伺服器IP: `2400:1b85:637b::1234/64`  
 伺服器路由: `2400:1b85:637b::1 via ens18`
 
-客戶端IP: `fda8:989f:eff5::ffff/64`
+客戶端IP: `fda8:989f:eff5::ffff/64`  
 客戶端路由: `fe80::b438:4f31 via eth2`
 
-伺服器:
+## 伺服器
 
 幫 `ens18` 設定 `ip rule`:
 ```ifupdown
@@ -39,7 +39,7 @@ iface gre6-kskbix inet6 static
 
 `update_tun_ssl.py` 在另外一個檔案 ，放到 `/root/update_tun_ssl.py`
 
-客戶端:
+## 客戶端
 
 幫 `eth2` 設定 `ip rule`:
 ```ifupdown
@@ -63,6 +63,8 @@ iface gre6-stuix inet6 static
 
 
 更新腳本:
+放在 crontab 每分鐘執行一次
+
 ```bash
 #!/bin/bash
 
@@ -75,15 +77,14 @@ if [ -z "$ipv6_address" ]; then
     exit 1
 fi
 set -x
-# Clear IP rules related to table 3462
-ip -6 rule del table 3462 || true
 
-# Add new rule
+# Flush the ip rule based on new IPv6 address read from interface
+ip -6 rule del table 3462 || true
 ip -6 rule add from "$ipv6_address" lookup 3462
 
 # Update local address of tunnel "gre-up"
 ip link set gre6-stuix type ip6gre local "$ipv6_address"
 
 # Post the address to remote server
-timeout 10 curl -k --interface "$ipv6_address" -X POST -d myip https://admin:password@[2405:a640:1042::1]:16581/update_endpoint_ip
+timeout 10 curl -k --interface "$ipv6_address" -X POST -d myip https://admin:password@[2400:1b85:637b::1234]:16581/update_endpoint_ip
 ```
