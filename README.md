@@ -21,7 +21,8 @@ iface ens18 inet6 static
     post-up ip -6 rule add from 2400:1b85:637b::1234/128 lookup 18041
 ```
 
-設定 gre/vxlan 隧道:
+設定 gre/vxlan 隧道:  
+要安裝 tmux ，API server 跑在 tmux 裡面
 
 ```ifupdown
 auto gre6-kskbix
