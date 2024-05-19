@@ -85,6 +85,7 @@ ip -6 rule add from "$ipv6_address" lookup 3462
 
 # Update local address of tunnel "gre-up"
 ip link set gre6-stuix type ip6gre local "$ipv6_address"
+ip link set gre6-stuix mtu 1448
 
 # Post the address to remote server
 timeout 10 curl -k --interface "$ipv6_address" -X POST -d myip https://admin:password@[2400:1b85:637b::1234]:16581/update_endpoint_ip

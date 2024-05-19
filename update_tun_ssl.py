@@ -21,6 +21,7 @@ class AuthHandler(SimpleHTTPRequestHandler):
         if new_ip != current_ip:
             try:
                 subprocess.run(['ip', 'link', 'set', args.tunnel_name, 'type', args.tunnel_type, 'remote', new_ip], check=True)
+                subprocess.run(['ip', 'link', 'set', args.tunnel_name, 'mtu', args.tunnel_mtu], check=True)
                 current_ip = new_ip
                 self.send_response(200)
                 self.send_header('Content-type', 'text/plain')
@@ -85,6 +86,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='HTTP server for updating tunnel endpoint')
     parser.add_argument('-t', '--tunnel_name', help='Name of the tunnel', required=True)
     parser.add_argument('-T', '--tunnel_type', help='Type of the tunnel (e.g., vxlan, gre)', required=True)
+    parser.add_argument('-M', '--tunnel_mtu', help='MTU of the tunnel', default="1448")
     parser.add_argument('-a', '--auth_credentials', help='Authentication credentials (default: admin:password)', default="admin:password")
     parser.add_argument('-c', '--cert_file', help='Path to SSL certificate file (default: /root/ssl.pem)', default="/root/ssl.pem")
     parser.add_argument('-k', '--key_file', help='Path to SSL key file (default: /root/ssl.key)', default="/root/ssl.key")
@@ -93,5 +95,3 @@ if __name__ == '__main__':
     args.auth_credentials_base64 = base64.b64encode(f"{args.auth_credentials}".encode()).decode()
     
     run(args=args)
-
-    
