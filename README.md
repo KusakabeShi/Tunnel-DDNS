@@ -72,6 +72,7 @@ iface gre6-stuix inet6 static
 # Extract IPv6 address
 ipv6_address=$(ip -6 addr show eth2 | awk '/inet6/ && !/deprecated/ && !/fe80/ {print $2}' | cut -d'/' -f1)
 
+
 # Check if IPv6 address is found
 if [ -z "$ipv6_address" ]; then
     echo "Error: No IPv6 address found."
