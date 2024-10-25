@@ -66,28 +66,4 @@ iface gre6-stuix inet6 static
 更新腳本:
 放在 crontab 每分鐘執行一次
 
-```bash
-#!/bin/bash
-
-# Extract IPv6 address
-ipv6_address=$(ip -6 addr show eth2 | awk '/inet6/ && !/deprecated/ && !/fe80/ {print $2}' | cut -d'/' -f1)
-
-
-# Check if IPv6 address is found
-if [ -z "$ipv6_address" ]; then
-    echo "Error: No IPv6 address found."
-    exit 1
-fi
-set -x
-
-# Flush the ip rule based on new IPv6 address read from interface
-ip -6 rule del table 3462 || true
-ip -6 rule add from "$ipv6_address" lookup 3462
-
-# Update local address of tunnel "gre-up"
-ip link set gre6-stuix type ip6gre local "$ipv6_address"
-ip link set gre6-stuix mtu 1448
-
-# Post the address to remote server
-timeout 10 curl -k --interface "$ipv6_address" -X POST -d myip https://admin:password@[2400:1b85:637b::1234]:16581/update_endpoint_ip
-```
+https://github.com/KusakabeShi/Tunnel-DDNS/blob/main/update_src.sh
